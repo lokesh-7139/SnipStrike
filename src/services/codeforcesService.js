@@ -2,13 +2,12 @@ const axios = require('axios');
 
 exports.getCFUserInfo = async (handle) => {
   try {
-    const response = await axios.get(
-      `https://codeforces.com/api/user.info?handles=${handle}&checkHistoricHandles=false`
-    );
-
-    if (response.status === 'FAILED') {
-      return ['failed', 'No user'];
-    }
+    const response = await axios.get('https://codeforces.com/api/user.info', {
+      params: {
+        handles: handle,
+        checkHistoricHandles: false,
+      },
+    });
 
     const user = response.result[0];
 
@@ -25,5 +24,28 @@ exports.getCFUserInfo = async (handle) => {
     ];
   } catch (err) {
     return ['failed', 'Failed to fetch Codeforces user info'];
+  }
+};
+
+exports.getProblems = async (tags) => {
+  try {
+    const response = await axios.get(
+      'https://codeforces.com/api/problemset.problems',
+      {
+        params: tags ? { tags } : {},
+      }
+    );
+
+    const problems = response.data.result.problems;
+
+    return {
+      status: 'success',
+      problems,
+    };
+  } catch (err) {
+    return {
+      status: 'failed',
+      message: 'Failed to fetch problems',
+    };
   }
 };
